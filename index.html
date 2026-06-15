@@ -205,7 +205,7 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <label class="text-[10px] text-slate-600 font-bold">RNG Pos</label>
-                            <input type="number" id="rngPos" value="1" class="w-14 text-right font-mono text-xs font-bold" oninput="updateVirtualScroll(); updateAdvances()">
+                            <input type="number" id="rngPos" value="1" class="w-14 text-right font-mono text-xs font-bold" oninput="updateAdvances()">
                         </div>
                         <div class="flex justify-between items-center">
                             <label class="text-[10px] text-slate-600 font-bold">Gil Chance</label>
@@ -563,10 +563,10 @@
                     // Table shows contents for EVERY row, no "No Spawn" label.
                     //
                     // Chest RNG sequence relative to row i:
-                    //   gilIdx     = i + rngPos      → Gil/Item check  (% < gilChance = Gil)
-                    //   contentIdx = i + rngPos + 1  → Content          (Gil amt | Item A/B)
-                    const gilIdx     = i + rngPos;
-                    const contentIdx = i + rngPos + 1;
+                    //   gilIdx     = i + 1  → Gil/Item check  (% < gilChance = Gil)
+                    //   contentIdx = i + 2  → Content          (Gil amt | Item A/B)
+                    const gilIdx     = i + 1;
+                    const contentIdx = i + 2;
 
                     let contentsHtml = '<span class="text-slate-300">—</span>';
 
@@ -795,25 +795,24 @@
                 const wantItem1  = document.getElementById('wantItem1').checked;
 
                 // --- Advance to Appear (Zoning-in required to spawn the chest) ---
-                // Find smallest Z >= P + 1 + rngPos where spawn check passes (at Z - 1)
-                let Z = P + 1 + rngPos;
+                // Find smallest spawnIdx >= P + rngPos where spawn check passes
+                let spawnIdx = P + rngPos;
                 let foundAppear = false;
-                while (Z < generatedData.length) {
-                    const spawnIdx = Z - 1;
-                    if (spawnIdx < generatedData.length && generatedData[spawnIdx].percent < appChance) {
+                while (spawnIdx < generatedData.length) {
+                    if (generatedData[spawnIdx].percent < appChance) {
                         foundAppear = true;
                         break;
                     }
-                    Z++;
+                    spawnIdx++;
                 }
-                document.getElementById('advAppear').innerText = foundAppear ? Z - P - 1 - rngPos : "-";
+                document.getElementById('advAppear').innerText = foundAppear ? spawnIdx - P - rngPos : "-";
 
                 // --- Advance for Item (Loot from ALREADY spawned chest) ---
-                // Find smallest W >= P + rngPos where:
+                // Find smallest W >= P + 1 where:
                 //   1. Gil/Item check = Item (NOT Gil, at W)
                 //   2. Item selection = desired item (Item 1 or Item 2, at W + 1)
                 let advItem = "-";
-                for (let W = P + rngPos; W < generatedData.length; W++) {
+                for (let W = P + 1; W < generatedData.length; W++) {
                     const gilIdx     = W;          // gil vs item check
                     const contentIdx = W + 1;      // item selection / gil amount
 
@@ -824,8 +823,8 @@
 
                     // 2. Check which item
                     const isItem1 = generatedData[contentIdx].percent < item1Chance;
-                    if (wantItem1 && isItem1)  { advItem = W - P - rngPos; break; }
-                    if (!wantItem1 && !isItem1) { advItem = W - P - rngPos; break; }
+                    if (wantItem1 && isItem1)  { advItem = W - P - 1; break; }
+                    if (!wantItem1 && !isItem1) { advItem = W - P - 1; break; }
                 }
                 document.getElementById('advItem').innerText = advItem;
             } 
