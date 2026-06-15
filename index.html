@@ -23,7 +23,7 @@
             background-color: #ffffff; 
             border: 1px solid #e2e8f0; 
             border-radius: 0.75rem; 
-            padding: 1.25rem; 
+            padding: 1rem; 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             position: relative;
         }
@@ -53,7 +53,6 @@
             background: linear-gradient(to bottom, #0ea5e9, #0284c7);
             border: 1px solid #0284c7; 
             border-radius: 0.375rem; 
-            padding: 0.5rem 1rem;
             color: white;
             font-weight: 600;
             cursor: pointer; 
@@ -110,25 +109,33 @@
         }
         
         .cell-border { border-right: 1px solid #e2e8f0; }
+
+        /* Custom Scrollbar for top horizontal strip */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="flex flex-col md:h-screen md:overflow-hidden">
 
     <!-- Header -->
-    <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between z-20 shadow-sm gap-3 md:gap-0 shrink-0">
-        <div class="text-center md:text-left">
+    <header id="appHeader" class="bg-white border-b border-slate-200 px-4 py-3 flex flex-col md:flex-row items-center justify-between z-20 shadow-sm gap-2 md:gap-0 shrink-0 transition-all duration-300">
+        <div class="text-center md:text-left flex items-center gap-3 w-full md:w-auto">
+            <!-- Sidebar Toggle Button (clean icon) -->
+            <button onclick="toggleSidebar()" title="Show/Hide Setup Panel" class="group bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-600 hover:text-slate-900 p-2 rounded-lg transition-all active:scale-95 shrink-0">
+                <svg id="sidebarIconOpen" class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <svg id="sidebarIconClose" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
             <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">
                 Final Fantasy XII RNG Cure
             </h1>
-            <p class="text-slate-500 text-sm font-medium mt-0.5">by yugitanpa.oh</p>
         </div>
         
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border-2 border-slate-200">
-                <span class="text-slate-500 text-sm font-semibold">Version:</span>
-                <select id="versionSelect" class="w-28 text-sm font-bold text-blue-600 border-none bg-transparent focus:ring-0 cursor-pointer" onchange="generateList()">
-                    <option value="ps2">PS2</option>
-                    <option value="izjs">IZJS</option>
+        <div class="flex items-center gap-3 md:gap-4 w-full md:w-auto justify-between md:justify-end">
+            <p class="text-slate-500 text-xs font-medium md:mr-2">by yugitanpa.oh</p>
+            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg border-2 border-slate-200">
+                <span class="text-slate-500 text-xs font-semibold">Version:</span>
+                <select id="versionSelect" class="w-24 md:w-28 text-xs font-bold text-blue-600 border-none bg-transparent focus:ring-0 cursor-pointer p-0" onchange="generateList()">
+                    <option value="ps2">PS2 / IZJS</option>
                     <option value="tza" selected>TZA / PC</option>
                 </select>
             </div>
@@ -136,188 +143,185 @@
     </header>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col md:flex-row md:overflow-hidden p-3 md:p-6 gap-4 md:gap-6">
+    <div class="flex-1 flex flex-col md:flex-row md:overflow-hidden p-2 md:p-4 gap-2 md:gap-4">
         
-        <!-- Left Panel: Controls -->
-        <div class="w-full md:w-[420px] shrink-0 flex flex-col gap-4 md:overflow-y-auto pr-1 pb-4 md:pb-10">
+        <!-- Left Panel: Controls (Collapsible Sidebar) -->
+        <div id="leftSidebar" class="w-full md:w-[340px] shrink-0 flex flex-col gap-3 md:overflow-y-auto pr-1 pb-2 transition-all duration-300">
             
-            <!-- Mobile Toggle Button -->
-            <button id="mobileConfigToggle" onclick="toggleConfig()" class="md:hidden w-full bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow-md flex justify-between items-center transition active:scale-95">
-                <span class="flex items-center gap-2">⚙️ Setup & Modules</span>
-                <span id="toggleIcon" class="text-sm bg-slate-700 px-2 py-1 rounded">▼ Hide</span>
-            </button>
-
             <!-- Character Stats -->
-            <div class="panel config-item">
+            <div class="panel">
                 <div class="panel-title">Character Setup</div>
                 <div class="flex flex-col gap-3">
                     <div class="flex items-center justify-between">
-                        <label class="text-sm font-bold text-slate-700">Level</label>
-                        <input type="number" id="levelInput" value="3" class="w-20 text-right font-mono font-bold text-lg" onchange="generateList()">
-                        <label class="text-sm font-bold text-slate-700 ml-4">Magick</label>
-                        <input type="number" id="magickInput" value="23" class="w-20 text-right font-mono font-bold text-lg" onchange="generateList()">
+                        <label class="text-xs font-bold text-slate-700">Level</label>
+                        <input type="number" id="levelInput" value="3" class="w-16 text-right font-mono font-bold text-sm" onchange="generateList()">
+                        <label class="text-xs font-bold text-slate-700 ml-2">Magick</label>
+                        <input type="number" id="magickInput" value="23" class="w-16 text-right font-mono font-bold text-sm" onchange="generateList()">
                     </div>
                     <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <label class="text-sm font-bold text-slate-700">Spell</label>
-                        <select id="spellSelect" class="w-32 font-bold" onchange="generateList()">
+                        <label class="text-xs font-bold text-slate-700">Spell</label>
+                        <select id="spellSelect" class="w-28 text-sm font-bold" onchange="generateList()">
                             <option value="20">Cure</option>
                             <option value="45">Cura</option>
                             <option value="85">Curaga</option>
                             <option value="145">Curaja</option>
                         </select>
-                        <label class="flex items-center gap-2 cursor-pointer group bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 hover:bg-slate-100">
-                            <input type="checkbox" id="serenityCheck" class="w-4 h-4 rounded border-slate-400 text-blue-600 focus:ring-blue-500 bg-white" onchange="generateList()"> 
-                            <span class="text-sm font-bold text-slate-700">Serenity</span>
+                        <label class="flex items-center gap-1.5 cursor-pointer group bg-slate-50 px-2 py-1 rounded border border-slate-200 hover:bg-slate-100">
+                            <input type="checkbox" id="serenityCheck" class="w-3.5 h-3.5 rounded border-slate-400 text-blue-600 focus:ring-blue-500 bg-white" onchange="generateList()"> 
+                            <span class="text-xs font-bold text-slate-700">Serenity</span>
                         </label>
                     </div>
                 </div>
             </div>
 
-            <!-- MASSIVE MODULE SELECTOR -->
-            <div class="bg-slate-100 p-2 rounded-xl border-2 border-slate-200 config-item">
-                <div class="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Select Active Module</div>
-                <div class="flex gap-2 relative">
-                    <button id="tabBtn-chest" class="flex-1 tab-btn active-tab py-3 text-sm rounded-lg" onclick="setMode('chest')">Chest</button>
-                    <button id="tabBtn-steal" class="flex-1 tab-btn py-3 text-sm rounded-lg" onclick="setMode('steal')">Steal</button>
-                    <button id="tabBtn-spawn" class="flex-1 tab-btn py-3 text-sm rounded-lg" onclick="setMode('spawn')">Spawn</button>
+            <!-- MODULE SELECTOR -->
+            <div class="bg-slate-100 p-1.5 rounded-xl border-2 border-slate-200">
+                <div class="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 mt-0.5">Select Active Module</div>
+                <div class="flex gap-1.5 relative">
+                    <button id="tabBtn-chest" class="flex-1 tab-btn active-tab py-2 text-xs rounded-lg" onclick="setMode('chest')">Chest</button>
+                    <button id="tabBtn-steal" class="flex-1 tab-btn py-2 text-xs rounded-lg" onclick="setMode('steal')">Steal</button>
+                    <button id="tabBtn-spawn" class="flex-1 tab-btn py-2 text-xs rounded-lg" onclick="setMode('spawn')">Spawn</button>
                 </div>
             </div>
 
-            <!-- PANEL: CHEST -->
-            <div id="panel-chest" class="block animate-fade-in">
-                <div class="panel border-2 border-blue-200 bg-blue-50/50 shadow-md config-item">
-                    <div class="panel-title text-blue-600 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        Chest Module
+            <!-- PANEL: CHEST INPUTS -->
+            <div id="left-panel-chest" class="block animate-fade-in">
+                <div class="panel border-2 border-blue-200 bg-blue-50/50 shadow-sm">
+                    <div class="panel-title text-blue-600 flex items-center gap-1.5 mb-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        Chest Settings
                     </div>
-                    <div class="grid grid-cols-2 gap-x-6 gap-y-3">
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2.5">
                         <div class="flex justify-between items-center">
-                            <label class="text-xs text-slate-600 font-bold">Appears Chance</label>
-                            <input type="number" id="appChance" value="50" class="w-16 text-right font-mono text-sm font-bold" oninput="updateAdvances()">
+                            <label class="text-[10px] text-slate-600 font-bold">Appears %</label>
+                            <input type="number" id="appChance" value="50" class="w-14 text-right font-mono text-xs font-bold" oninput="updateAdvances()">
                         </div>
                         <div class="flex justify-between items-center">
-                            <label class="text-xs text-slate-600 font-bold">RNG Position</label>
-                            <input type="number" id="rngPos" value="1" class="w-16 text-right font-mono text-sm font-bold" oninput="updateAdvances()">
+                            <label class="text-[10px] text-slate-600 font-bold">RNG Pos</label>
+                            <input type="number" id="rngPos" value="1" class="w-14 text-right font-mono text-xs font-bold" oninput="updateAdvances()">
                         </div>
                         <div class="flex justify-between items-center">
-                            <label class="text-xs text-slate-600 font-bold">Gil Chance</label>
-                            <input type="number" id="gilChance" value="50" class="w-16 text-right font-mono text-sm font-bold" oninput="updateVirtualScroll()">
+                            <label class="text-[10px] text-slate-600 font-bold">Gil Chance</label>
+                            <input type="number" id="gilChance" value="50" class="w-14 text-right font-mono text-xs font-bold" oninput="updateVirtualScroll()">
                         </div>
                         <div class="flex justify-between items-center">
-                            <label class="text-xs text-slate-600 font-bold">Gil Amount</label>
-                            <input type="number" id="gilAmt" value="100" class="w-16 text-right font-mono text-sm font-bold" oninput="updateVirtualScroll()">
+                            <label class="text-[10px] text-slate-600 font-bold">Gil Amount</label>
+                            <input type="number" id="gilAmt" value="100" class="w-14 text-right font-mono text-xs font-bold" oninput="updateVirtualScroll()">
                         </div>
-                        <div class="flex justify-between items-center col-span-2 mt-3 pt-3 border-t-2 border-blue-100">
-                            <label class="text-sm font-bold text-amber-700 flex items-center gap-2 cursor-pointer bg-amber-50 px-3 py-2 rounded-lg border border-amber-200 w-full hover:bg-amber-100 transition">
-                                <input type="checkbox" id="diamondArmlet" class="w-5 h-5 rounded border-amber-400 text-amber-500 focus:ring-amber-500" onchange="updateVirtualScroll(); updateAdvances();"> 
+                        <div class="flex justify-between items-center col-span-2 mt-2 pt-2 border-t-2 border-blue-100">
+                            <label class="text-xs font-bold text-amber-700 flex items-center gap-2 cursor-pointer bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200 w-full hover:bg-amber-100 transition">
+                                <input type="checkbox" id="diamondArmlet" class="w-4 h-4 rounded border-amber-400 text-amber-500 focus:ring-amber-500" onchange="updateVirtualScroll(); updateAdvances();"> 
                                 Diamond Armlet Equipped
                             </label>
                         </div>
-                        <div class="flex justify-between items-center col-span-2 mt-1">
-                            <label class="text-sm text-blue-700 font-bold flex items-center gap-2 cursor-pointer bg-blue-100/50 px-3 py-2 rounded-lg border border-blue-200 w-full hover:bg-blue-100 transition">
-                                <input type="checkbox" id="wantItem1" class="w-5 h-5 rounded border-blue-400 text-blue-600 focus:ring-blue-500" onchange="updateAdvances()">
-                                Search for Item 1
+                        <div class="flex justify-between items-center col-span-2 mt-0.5">
+                            <label class="text-xs text-blue-700 font-bold flex items-center gap-2 cursor-pointer bg-blue-100/50 px-2.5 py-1.5 rounded-lg border border-blue-200 w-full hover:bg-blue-100 transition">
+                                <input type="checkbox" id="wantItem1" class="w-4 h-4 rounded border-blue-400 text-blue-600 focus:ring-blue-500" onchange="updateAdvances()">
+                                Advance for Item A (Common)
                             </label>
                         </div>
                     </div>
                 </div>
-
-                <div class="flex gap-2 md:gap-3 mt-3">
-                    <div class="panel flex-1 flex flex-col justify-center items-center bg-white border-2 border-sky-200 shadow-sm md:shadow-md">
-                        <div class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0 md:mb-1">Advance to Appear</div>
-                        <div id="advAppear" class="text-3xl md:text-4xl font-bold font-mono text-sky-600">-</div>
-                    </div>
-                    <div class="panel flex-1 flex flex-col justify-center items-center bg-white border-2 border-emerald-200 shadow-sm md:shadow-md">
-                        <div class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0 md:mb-1">Advance for Item</div>
-                        <div id="advItem" class="text-3xl md:text-4xl font-bold font-mono text-emerald-600">-</div>
-                    </div>
+                <!-- Chest Tips -->
+                <div class="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-[11px] text-slate-600 leading-relaxed space-y-1.5">
+                    <p class="font-bold text-blue-700 text-xs">📦 Cara Pakai Chest:</p>
+                    <p>Lihat angka <span class="font-bold text-sky-700">Advance to Appear</span> — itu jumlah langkah RNG yang perlu kamu lakukan sebelum peti muncul.</p>
+                    <p>Setelah itu, lihat <span class="font-bold text-emerald-700">Advance for Item</span> — langkah tambahan agar peti berisi item yang kamu mau (bukan Gil).</p>
+                    <p class="pt-1 border-t border-blue-200">⚡ <span class="font-bold">1 langkah RNG</span> = cast 1x Cure/Cura, atau minum 1 Potion.<br>⚡ <span class="font-bold">10 langkah sekaligus</span> = pukul diri sendiri tanpa senjata (self-hit unarmed). <span class="text-slate-500">Disarankan pakai Shield + Cameo Belt agar pukulan tidak meleset (block).</span></p>
                 </div>
             </div>
 
-            <!-- PANEL: STEAL -->
-            <div id="panel-steal" class="hidden animate-fade-in">
-                <div class="flex flex-col gap-3">
-                    <div class="panel border-2 border-indigo-200 bg-indigo-50 flex justify-between items-center shadow-sm md:shadow-md">
-                        <div>
-                            <div class="panel-title text-indigo-700 mb-0 md:mb-1 flex items-center gap-1 md:gap-2">
-                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                Normal Steal
-                            </div>
-                            <div class="text-[9px] md:text-xs text-slate-600 font-bold bg-indigo-100 px-1.5 py-0.5 md:px-2 md:py-1 rounded inline-block">Advance for Rare (3%)</div>
-                        </div>
-                        <div id="advRareNormal" class="text-3xl md:text-5xl font-bold font-mono text-indigo-600">-</div>
-                    </div>
-                    <div class="panel border-2 border-purple-200 bg-purple-50 flex justify-between items-center shadow-sm md:shadow-md">
-                        <div>
-                            <div class="panel-title text-purple-700 mb-0 md:mb-1 flex items-center gap-1 md:gap-2">
-                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                Thief's Cuffs
-                            </div>
-                            <div class="text-[9px] md:text-xs text-slate-600 font-bold bg-purple-100 px-1.5 py-0.5 md:px-2 md:py-1 rounded inline-block">Advance for Rare (6%)</div>
-                        </div>
-                        <div id="advRareCuffs" class="text-3xl md:text-5xl font-bold font-mono text-purple-600">-</div>
-                    </div>
+            <!-- PANEL: STEAL INPUTS -->
+            <div id="left-panel-steal" class="hidden animate-fade-in">
+                <!-- Steal Tips -->
+                <div class="mt-1 bg-indigo-50 border border-indigo-200 rounded-lg p-2.5 text-[11px] text-slate-600 leading-relaxed space-y-1.5">
+                    <p class="font-bold text-indigo-700 text-xs">🃏 Cara Pakai Steal:</p>
+                    <p>Lihat angka <span class="font-bold text-indigo-700">Advance for Rare (3%)</span> — jumlah langkah RNG agar steal kamu menghasilkan item langka (3% chance).</p>
+                    <p>Kalau pakai <span class="font-bold text-purple-700">Thief's Cuffs</span>, peluang rare naik jadi 6% — lihat kolom Advance for Rare (6%) untuk jumlah langkahnya.</p>
+                    <p class="pt-1 border-t border-indigo-200">⚡ <span class="font-bold">1 langkah RNG</span> = cast 1x Cure/Cura, atau minum 1 Potion.<br>⚡ <span class="font-bold">10 langkah sekaligus</span> = pukul diri sendiri tanpa senjata (self-hit unarmed). <span class="text-slate-500">Disarankan pakai Shield + Cameo Belt agar pukulan tidak meleset (block).</span></p>
                 </div>
             </div>
 
-            <!-- PANEL: SPAWN -->
-            <div id="panel-spawn" class="hidden animate-fade-in">
-                <div class="panel border-2 border-red-200 bg-red-50 shadow-sm md:shadow-md">
-                    <div class="panel-title text-red-600 flex items-center gap-1 md:gap-2 mb-1 md:mb-2">
-                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
-                        Rare Monster Spawn
-                    </div>
-                    <div class="flex justify-between items-center mt-2 md:mt-4">
-                        <div>
-                            <div class="text-base md:text-lg font-bold text-slate-800">Lv99 Red Chocobo</div>
-                            <div class="text-[9px] md:text-xs text-slate-600 mt-1 md:mt-2 font-bold bg-white px-1.5 py-0.5 md:px-2 md:py-1 rounded border border-red-100 inline-block">Requires Raw RNG < 16,777,216</div>
-                        </div>
-                        <div class="flex flex-col items-end">
-                            <span class="text-[9px] md:text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-0 md:mb-1">Advance To Spawn</span>
-                            <span id="advSpawn" class="text-4xl md:text-5xl font-bold font-mono text-red-600 drop-shadow-sm">-</span>
-                        </div>
-                    </div>
+            <!-- PANEL: SPAWN INPUTS -->
+            <div id="left-panel-spawn" class="hidden animate-fade-in">
+                <!-- Spawn Tips -->
+                <div class="mt-1 bg-red-50 border border-red-200 rounded-lg p-2.5 text-[11px] text-slate-600 leading-relaxed space-y-1.5">
+                    <p class="font-bold text-red-700 text-xs">🔴 Cara Pakai Spawn (Red Chocobo Lv99):</p>
+                    <p>Lihat angka <span class="font-bold text-red-600">Advance to Spawn</span> — itu jumlah langkah RNG yang perlu kamu lakukan agar Red Chocobo Lv99 muncul saat kamu masuk area.</p>
+                    <p>Angka <span class="font-bold">0</span> artinya kamu sudah siap masuk area sekarang!</p>
+                    <p class="pt-1 border-t border-red-200">⚡ <span class="font-bold">1 langkah RNG</span> = cast 1x Cure/Cura, atau minum 1 Potion.<br>⚡ <span class="font-bold">10 langkah sekaligus</span> = pukul diri sendiri tanpa senjata (self-hit unarmed). <span class="text-slate-500">Disarankan pakai Shield + Cameo Belt agar pukulan tidak meleset (block).</span></p>
                 </div>
             </div>
 
-            <!-- RNG Search -->
-            <div class="panel mt-auto bg-slate-50 border-2 border-slate-200 shadow-md">
-                <div class="flex justify-between items-center mb-2">
-                    <div class="panel-title !mb-0 text-slate-700">Sequence Search</div>
-                    <div id="statusBox" class="text-[10px] font-bold tracking-wider px-2 py-1 rounded border text-gray-500 bg-white border-gray-300 uppercase shadow-sm">READY</div>
-                </div>
-                
-                <div class="text-[11px] text-slate-500 font-medium mb-3 bg-white p-2 rounded border border-slate-200 shadow-sm leading-relaxed">
-                    <span class="font-bold text-slate-700">Actions:</span><br>
-                    • Cure, Potion = <span class="font-mono bg-slate-100 px-1 rounded text-slate-700">1 row</span><br>
-                    • Self hit unarmed = <span class="font-mono bg-slate-100 px-1 rounded text-slate-700">10 row</span>
-                </div>
-                
-                <div id="sequenceDisplay" class="text-xs text-blue-700 mb-3 font-mono font-bold break-words min-h-[1rem] bg-blue-50 p-2 rounded border border-blue-100">Sequence: (None)</div>
-                
-                <div class="flex items-center gap-2 mb-3">
-                    <input type="text" id="healInput" placeholder="Enter Heal Value..." class="w-full font-mono font-bold text-lg shadow-sm py-2" onkeydown="if(event.key==='Enter') searchHeal(false)">
-                </div>
-                <div class="flex items-center gap-2 mb-4">
-                    <button onclick="searchHeal(false)" class="btn flex-1 text-sm py-2 shadow-sm uppercase tracking-wider">Start</button>
-                    <button onclick="searchHeal(true)" class="btn btn-secondary flex-1 text-sm py-2 shadow-sm font-bold uppercase tracking-wider bg-white">Continue</button>
-                </div>
-                
-                <div class="flex items-center gap-2 pt-4 border-t-2 border-slate-200">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Manual Advance:</label>
-                    <input type="number" id="consumeInput" value="10" class="w-16 text-center font-mono font-bold text-sm shadow-sm py-1.5">
-                    <button onclick="consumeRNG()" class="btn btn-secondary text-xs px-3 py-1.5 shadow-sm font-bold">Consume</button>
-                    <button onclick="clearSearch()" class="btn btn-secondary text-xs px-3 py-1.5 ml-auto shadow-sm text-red-600 border-red-200 bg-white hover:bg-red-50 font-bold">Reset</button>
-                </div>
-            </div>
+        </div> <!-- End Sidebar -->
 
-        </div>
-
-        <!-- Right Panel: RNG Table -->
-        <div class="h-[75vh] md:h-auto md:flex-1 bg-white border-2 border-slate-200 rounded-xl flex flex-col shadow-lg overflow-hidden relative min-h-[300px]">
+        <!-- Right Panel: Main Action Area -->
+        <div class="h-[75vh] md:h-auto md:flex-1 bg-white border-2 border-slate-200 rounded-xl flex flex-col shadow-lg overflow-hidden relative min-h-[400px]">
             
+            <!-- TOP ACTION BAR -->
+            <div class="bg-slate-50 border-b-2 border-slate-200 p-2 md:p-3 flex flex-col gap-2 z-20 shadow-sm shrink-0">
+                
+                <!-- Row 1: Sequence Search (toggle button is now in Header) -->
+                <div class="flex items-center gap-1.5 md:gap-2 bg-white p-1.5 md:p-2 rounded-lg border border-slate-200 shadow-inner overflow-x-auto hide-scroll">
+                    <div id="statusBox" class="text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded border text-gray-500 bg-slate-50 border-gray-300 uppercase shrink-0">READY</div>
+                    
+                    <input type="text" id="healInput" placeholder="Heal value..." class="w-20 md:w-24 font-mono font-bold text-xs md:text-sm py-0.5 px-1.5 border-2 border-slate-200 rounded focus:border-blue-400 shrink-0" onkeydown="if(event.key==='Enter') searchHeal(false)">
+                    
+                    <button onclick="searchHeal(false)" class="btn text-[9px] md:text-xs py-1 px-2.5 shrink-0 tracking-wide uppercase">Start</button>
+                    <button onclick="searchHeal(true)" class="btn btn-secondary font-bold text-[9px] md:text-xs py-1 px-2.5 shrink-0 tracking-wide uppercase">Continue</button>
+                    
+                    <div class="w-px h-5 bg-slate-300 mx-0.5 md:mx-1 shrink-0"></div>
+                    
+                    <input type="number" id="consumeInput" value="10" class="w-12 md:w-14 text-center font-mono font-bold text-[10px] md:text-xs py-0.5 border-2 border-slate-200 rounded shrink-0">
+                    <button onclick="consumeRNG()" class="btn btn-secondary text-[9px] md:text-xs px-2.5 py-1 shrink-0 font-bold uppercase">Consume</button>
+                    
+                    <div class="flex-1 min-w-[2px]"></div>
+                    
+                    <button onclick="clearSearch()" class="btn btn-secondary text-[9px] md:text-xs px-2.5 py-1 text-red-600 border-red-200 bg-white hover:bg-red-50 font-bold shrink-0 uppercase tracking-wide">Reset</button>
+                </div>
+
+                <!-- Row 2: Advance Trackers -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mt-1">
+                    
+                    <div id="sequenceDisplay" class="font-mono font-bold text-blue-700 text-[10px] md:text-[11px] truncate w-full sm:max-w-[40%] bg-blue-50/50 px-2 py-1 rounded border border-blue-100">Seq: (None)</div>
+
+                    <!-- CHEST ADVANCES -->
+                    <div id="top-adv-chest" class="flex gap-2 w-full sm:w-auto animate-fade-in flex-1 justify-end">
+                        <div class="bg-white border border-sky-200 rounded shadow-sm px-2 py-1 flex justify-between sm:justify-start items-center gap-3 md:gap-4 w-full sm:w-auto">
+                            <span class="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase whitespace-nowrap">To Appear</span>
+                            <span id="advAppear" class="text-lg md:text-xl font-bold font-mono text-sky-600 leading-none">-</span>
+                        </div>
+                        <div class="bg-white border border-emerald-200 rounded shadow-sm px-2 py-1 flex justify-between sm:justify-start items-center gap-3 md:gap-4 w-full sm:w-auto">
+                            <span class="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase whitespace-nowrap">For Item</span>
+                            <span id="advItem" class="text-lg md:text-xl font-bold font-mono text-emerald-600 leading-none">-</span>
+                        </div>
+                    </div>
+
+                    <!-- STEAL ADVANCES -->
+                    <div id="top-adv-steal" class="hidden gap-2 w-full sm:w-auto animate-fade-in flex-1 justify-end">
+                        <div class="bg-white border border-indigo-200 rounded shadow-sm px-2 py-1 flex justify-between sm:justify-start items-center gap-3 md:gap-4 w-full sm:w-auto">
+                            <span class="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase whitespace-nowrap">Rare (3%)</span>
+                            <span id="advRareNormal" class="text-lg md:text-xl font-bold font-mono text-indigo-600 leading-none">-</span>
+                        </div>
+                        <div class="bg-white border border-purple-200 rounded shadow-sm px-2 py-1 flex justify-between sm:justify-start items-center gap-3 md:gap-4 w-full sm:w-auto">
+                            <span class="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase whitespace-nowrap">Cuffs (6%)</span>
+                            <span id="advRareCuffs" class="text-lg md:text-xl font-bold font-mono text-purple-600 leading-none">-</span>
+                        </div>
+                    </div>
+
+                    <!-- SPAWN ADVANCES -->
+                    <div id="top-adv-spawn" class="hidden gap-2 w-full sm:w-auto animate-fade-in flex-1 justify-end">
+                        <div class="bg-white border border-red-200 rounded shadow-sm px-2 py-1 flex justify-between sm:justify-start items-center gap-3 md:gap-4 w-full sm:w-auto">
+                            <span class="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase whitespace-nowrap">To Spawn (Lv99 Red)</span>
+                            <span id="advSpawn" class="text-lg md:text-xl font-bold font-mono text-red-600 leading-none">-</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <!-- Dynamic Headers -->
-            <div id="tableHeaders" class="grid table-header font-bold text-[13px] sticky top-0 z-10 shadow-sm">
+            <div id="tableHeaders" class="grid table-header font-bold text-xs md:text-[13px] sticky top-0 z-10 shadow-sm shrink-0">
                 <!-- Rendered by JS -->
             </div>
 
@@ -434,28 +438,20 @@
             requestAnimationFrame(updateVirtualScroll);
         });
 
-        function toggleConfig() {
-            const items = document.querySelectorAll('.config-item');
-            const icon = document.getElementById('toggleIcon');
-            let isHidden = false;
-
-            items.forEach(item => {
-                if (item.classList.contains('hidden')) {
-                    item.classList.remove('hidden');
-                    if (item.classList.contains('bg-blue-50/50') || item.classList.contains('flex-col')) {
-                        // Keep block or flex displays intact when removing hidden
-                    }
-                    isHidden = false;
-                } else {
-                    item.classList.add('hidden');
-                    isHidden = true;
-                }
-            });
-
-            if (isHidden) {
-                icon.innerHTML = '▶ Show';
+        // Sidebar Toggle Logic
+        function toggleSidebar() {
+            const sidebar = document.getElementById('leftSidebar');
+            const iconOpen = document.getElementById('sidebarIconOpen');
+            const iconClose = document.getElementById('sidebarIconClose');
+            
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                iconOpen.classList.remove('hidden'); iconOpen.classList.add('block');
+                iconClose.classList.remove('block'); iconClose.classList.add('hidden');
             } else {
-                icon.innerHTML = '▼ Hide';
+                sidebar.classList.add('hidden');
+                iconOpen.classList.remove('block'); iconOpen.classList.add('hidden');
+                iconClose.classList.remove('hidden'); iconClose.classList.add('block');
             }
         }
 
@@ -464,29 +460,39 @@
             // Update Tab Buttons
             ['chest', 'steal', 'spawn'].forEach(m => {
                 document.getElementById(`tabBtn-${m}`).classList.remove('active-tab');
-                document.getElementById(`panel-${m}`).classList.remove('block');
-                document.getElementById(`panel-${m}`).classList.add('hidden');
+                
+                let leftPanel = document.getElementById(`left-panel-${m}`);
+                if (leftPanel) { leftPanel.classList.add('hidden'); leftPanel.classList.remove('block'); }
+                
+                let topAdv = document.getElementById(`top-adv-${m}`);
+                if (topAdv) { topAdv.classList.add('hidden'); topAdv.classList.remove('flex'); }
             });
+            
             document.getElementById(`tabBtn-${mode}`).classList.add('active-tab');
-            document.getElementById(`panel-${mode}`).classList.remove('hidden');
-            document.getElementById(`panel-${mode}`).classList.add('block');
+            
+            let activeLeft = document.getElementById(`left-panel-${mode}`);
+            if (activeLeft) { activeLeft.classList.add('block'); activeLeft.classList.remove('hidden'); }
+            
+            let activeTop = document.getElementById(`top-adv-${mode}`);
+            if (activeTop) { activeTop.classList.add('flex'); activeTop.classList.remove('hidden'); }
 
             // Update Table Headers
-            let headerHtml = `<div class="px-3 md:px-4 py-3 cell-border font-bold text-slate-600 bg-slate-100">Pos</div>
-                              <div class="px-3 md:px-4 py-3 cell-border font-bold text-slate-600 bg-slate-100">Heal</div>
-                              <div class="px-3 md:px-4 py-3 cell-border font-bold text-slate-600 bg-slate-100">%</div>`;
-            let headerGridClass = "grid-cols-4";
+            let headerHtml = `<div class="px-2 md:px-4 py-2 cell-border text-slate-600 bg-slate-100">Row</div>
+                              <div class="px-2 md:px-4 py-2 cell-border text-slate-600 bg-slate-100">Heal</div>`;
+            let headerGridClass = "grid-cols-3";
             
             if (mode === 'chest') {
-                headerHtml += `<div class="px-3 md:px-4 py-3 font-bold text-blue-600 bg-blue-50 border-b border-blue-200">Contents</div>`;
+                headerHtml += `<div class="px-2 md:px-4 py-2 cell-border text-slate-500 bg-slate-50">%</div>
+                               <div class="px-2 md:px-4 py-2 text-blue-700 bg-blue-50">Contents</div>`;
                 headerGridClass = "grid-cols-4";
             } else if (mode === 'steal') {
-                headerHtml += `<div class="px-3 md:px-4 py-3 cell-border font-bold text-indigo-700 bg-indigo-50 border-b border-indigo-200">Normal</div>
-                               <div class="px-3 md:px-4 py-3 font-bold text-purple-700 bg-purple-50 border-b border-purple-200">Thief's Cuffs</div>`;
+                headerHtml += `<div class="px-2 md:px-4 py-2 cell-border text-slate-500 bg-slate-50">%</div>
+                               <div class="px-2 md:px-4 py-2 cell-border text-indigo-700 bg-indigo-50">Normal</div>
+                               <div class="px-2 md:px-4 py-2 text-purple-700 bg-purple-50">Thief's Cuffs</div>`;
                 headerGridClass = "grid-cols-5";
             } else if (mode === 'spawn') {
-                headerHtml += `<div class="px-3 md:px-4 py-3 font-bold text-red-600 bg-red-50 border-b border-red-200">1/256 Target</div>`;
-                headerGridClass = "grid-cols-4";
+                headerHtml += `<div class="px-2 md:px-4 py-2 text-red-600 bg-red-50 border-b border-red-200">Spawn?</div>`;
+                headerGridClass = "grid-cols-3";
             }
             
             let tableHeaders = document.getElementById('tableHeaders');
@@ -509,10 +515,12 @@
             
             virtualList.style.transform = `translateY(${startIndex * ITEM_HEIGHT}px)`;
             
-            const gilChance = parseInt(document.getElementById('gilChance').value) || 0;
-            const hasArmlet = document.getElementById('diamondArmlet').checked;
+            const gilChance  = parseInt(document.getElementById('gilChance').value)  || 0;
+            const appChance  = parseInt(document.getElementById('appChance').value)   || 0;
+            const rngPos     = parseInt(document.getElementById('rngPos').value)       || 1;
+            const hasArmlet  = document.getElementById('diamondArmlet').checked;
             const item1Chance = hasArmlet ? 95 : 50;
-            const gilAmt = parseInt(document.getElementById('gilAmt').value) || 1;
+            const gilAmt     = parseInt(document.getElementById('gilAmt').value)       || 1;
 
             let html = '';
             for (let i = startIndex; i < endIndex; i++) {
@@ -527,21 +535,35 @@
                 let contentHtml = '';
 
                 if (currentMode === 'chest') {
-                    let contents = "";
-                    let isGil = d.percent < gilChance;
-                    let colorClass = "text-slate-500";
-                    if (i + 1 < generatedData.length) {
-                        let nextRN = generatedData[i+1].raw;
+                    // Spawn check → background only (Advance to Appear counter).
+                    // Table shows contents for EVERY row, no "No Spawn" label.
+                    //
+                    // Chest RNG sequence relative to row i:
+                    //   gilIdx     = i + rngPos      → Gil/Item check  (% < gilChance = Gil)
+                    //   contentIdx = i + rngPos + 1  → Content          (Gil amt | Item A/B)
+                    const gilIdx     = i + rngPos;
+                    const contentIdx = i + rngPos + 1;
+
+                    let contentsHtml = '<span class="text-slate-300">—</span>';
+
+                    if (contentIdx < generatedData.length) {
+                        const isGil = generatedData[gilIdx].percent < gilChance;
+
                         if (isGil) {
-                            contents = ((nextRN % gilAmt) + 1) + " Gil";
-                            colorClass = "text-amber-600 font-bold bg-amber-50/50 px-2 py-0.5 rounded"; 
+                            const gilAmount = (generatedData[contentIdx].raw % gilAmt) + 1;
+                            contentsHtml = `<span class="text-amber-600 font-bold">${gilAmount} Gil</span>`;
                         } else {
-                            let isItem1 = (nextRN % 100) < item1Chance;
-                            contents = isItem1 ? "Item 1" : "Item 2";
-                            colorClass = isItem1 ? "text-emerald-600 font-bold bg-emerald-50/50 px-2 py-0.5 rounded" : "text-sky-600 font-bold bg-sky-50/50 px-2 py-0.5 rounded";
+                            const isItemA = generatedData[contentIdx].percent < item1Chance;
+                            if (isItemA) {
+                                contentsHtml = `<span class="text-emerald-600 font-bold bg-emerald-50/50 px-1.5 py-0.5 rounded">Item A</span>`;
+                            } else {
+                                contentsHtml = hasArmlet
+                                    ? `<span class="text-amber-500 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-300">⭐ Item B (Rare)</span>`
+                                    : `<span class="text-sky-600 font-bold bg-sky-50/50 px-1.5 py-0.5 rounded">Item B</span>`;
+                            }
                         }
                     }
-                    contentHtml = `<div class="px-3 md:px-4 whitespace-nowrap"><span class="${colorClass}">${contents}</span></div>`;
+                    contentHtml = `<div class="px-2 md:px-3 whitespace-nowrap">${contentsHtml}</div>`;
                 } 
                 else if (currentMode === 'steal') {
                     let normal = "None";
@@ -555,14 +577,14 @@
                         let p3 = generatedData[i+2].percent;
                         
                         // Normal Steal
-                        if (p1 < 3) { normal = "Rare"; nColor = "text-amber-600 font-bold bg-amber-50/50 px-2 py-0.5 rounded"; }
-                        else if (p2 < 10) { normal = "Uncommon"; nColor = "text-emerald-600 font-bold bg-emerald-50/50 px-2 py-0.5 rounded"; }
+                        if (p1 < 3) { normal = "Rare"; nColor = "text-amber-600 font-bold bg-amber-50/50 px-1 py-0.5 rounded"; }
+                        else if (p2 < 10) { normal = "Uncommon"; nColor = "text-emerald-600 font-bold bg-emerald-50/50 px-1 py-0.5 rounded"; }
                         else if (p3 < 55) { normal = "Common"; nColor = "text-slate-600 font-semibold"; }
                         
                         // Thief's Cuffs Steal
                         let cList = [];
-                        if (p1 < 6) cList.push("<span class='text-amber-600 font-bold bg-amber-50/50 px-1.5 py-0.5 rounded'>Rare</span>");
-                        if (p2 < 30) cList.push("<span class='text-emerald-600 font-bold bg-emerald-50/50 px-1.5 py-0.5 rounded'>Uncommon</span>");
+                        if (p1 < 6) cList.push("<span class='text-amber-600 font-bold bg-amber-50/50 px-1 py-0.5 rounded'>Rare</span>");
+                        if (p2 < 30) cList.push("<span class='text-emerald-600 font-bold bg-emerald-50/50 px-1 py-0.5 rounded'>Uncommon</span>");
                         if (p3 < 80) cList.push("<span class='text-slate-600 font-semibold'>Common</span>");
                         
                         if (cList.length > 0) {
@@ -570,25 +592,31 @@
                             cColor = ""; 
                         }
                     }
-                    contentHtml = `<div class="px-3 md:px-4 cell-border whitespace-nowrap"><span class="${nColor}">${normal}</span></div><div class="px-3 md:px-4 whitespace-nowrap ${cColor}">${cuffs}</div>`;
+                    contentHtml = `<div class="px-2 md:px-4 cell-border whitespace-nowrap"><span class="${nColor}">${normal}</span></div><div class="px-2 md:px-4 whitespace-nowrap ${cColor}">${cuffs}</div>`;
                 }
                 else if (currentMode === 'spawn') {
                     let isChocobo = d.raw < 16777216 ? "True" : "False";
-                    let chocoClass = (isChocobo === "True" && !isHighlight) ? 'text-red-600 font-bold bg-red-100 px-2 py-0.5 rounded border border-red-200' : 'text-slate-400';
+                    let chocoClass = (isChocobo === "True" && !isHighlight) ? 'text-red-600 font-bold bg-red-100 px-1.5 py-0.5 rounded border border-red-200' : 'text-slate-400';
                     if(isChocobo === "True" && isHighlight) chocoClass = 'text-white font-bold';
-                    contentHtml = `<div class="px-3 md:px-4"><span class="${chocoClass}">${isChocobo}</span></div>`;
+                    contentHtml = `<div class="px-2 md:px-4"><span class="${chocoClass}">${isChocobo}</span></div>`;
                 }
 
-                let gridClass = currentMode === 'steal' ? 'grid-cols-5' : 'grid-cols-4';
+                // chest=4cols (Row,Heal,%,Contents), steal=5cols, spawn=3cols
+                let gridClass = currentMode === 'chest' ? 'grid-cols-4' : currentMode === 'spawn' ? 'grid-cols-3' : 'grid-cols-5';
                 
-                let textColor = 'text-slate-800 text-base';
-                if (isHighlight) textColor = 'text-blue-800 text-lg';
-                else if (isSequenceTrail) textColor = 'text-green-800 text-lg';
+                let textColor = 'text-slate-800 text-[13px] md:text-base';
+                if (isHighlight) textColor = 'text-blue-800 text-sm md:text-lg';
+                else if (isSequenceTrail) textColor = 'text-green-800 text-sm md:text-lg';
+
+                // % cell only for chest and steal
+                const percentCell = currentMode !== 'spawn'
+                    ? `<div class="px-2 md:px-3 cell-border font-mono text-slate-400 text-xs">${d.percent}</div>`
+                    : '';
 
                 html += `<div class="grid ${gridClass} grid-row cursor-pointer ${rowClass} items-center" style="height: ${ITEM_HEIGHT}px;" onclick="setHighlight(${i})">
-                    <div class="px-3 md:px-4 cell-border font-mono text-slate-400">${i + 1}</div>
-                    <div class="px-3 md:px-4 cell-border font-mono font-bold ${textColor}">${d.hp}</div>
-                    <div class="px-3 md:px-4 cell-border font-mono text-slate-400">${d.percent}</div>
+                    <div class="px-2 md:px-4 cell-border font-mono text-slate-400">${i + 1}</div>
+                    <div class="px-2 md:px-4 cell-border font-mono font-bold ${textColor}">${d.hp}</div>
+                    ${percentCell}
                     ${contentHtml}
                 </div>`;
             }
@@ -634,7 +662,7 @@
         function setStatus(text, colorClass) {
             const box = document.getElementById('statusBox');
             box.innerText = text;
-            box.className = `text-[10px] font-bold tracking-wider px-2 py-1 rounded border uppercase shadow-sm ${colorClass}`;
+            box.className = `text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded border uppercase shrink-0 ${colorClass}`;
         }
 
         function searchHeal(isContinue) {
@@ -647,7 +675,7 @@
                 searchSequence.push(target);
             }
             
-            document.getElementById('sequenceDisplay').innerHTML = "Sequence: <span class='text-blue-600'>" + searchSequence.join("</span> → <span class='text-blue-600'>") + "</span>";
+            document.getElementById('sequenceDisplay').innerHTML = "Seq: <span class='text-blue-600'>" + searchSequence.join("</span>→<span class='text-blue-600'>") + "</span>";
             
             let found = -1;
             let seqLen = searchSequence.length;
@@ -674,6 +702,7 @@
                 setHighlight(targetIndex);
                 scroller.scrollTop = Math.max(0, (targetIndex * ITEM_HEIGHT) - (scroller.clientHeight / 2));
                 setStatus("MATCH FOUND", "text-sky-700 bg-sky-100 border-sky-300");
+                
                 if (seqLen >= 2 && targetIndex + 1 < generatedData.length) {
                     let nextCure = generatedData[targetIndex + 1].hp;
                     document.getElementById('healInput').value = nextCure;
@@ -684,32 +713,32 @@
                 setStatus("NOT FOUND", "text-red-700 bg-red-100 border-red-300");
                 searchSequence.pop(); // Remove the bad input
                 if (searchSequence.length === 0) {
-                    document.getElementById('sequenceDisplay').innerText = "Sequence: (None)";
+                    document.getElementById('sequenceDisplay').innerText = "Seq: (None)";
                     sequenceStartIndex = -1;
                 } else {
-                    document.getElementById('sequenceDisplay').innerHTML = "Sequence: <span class='text-blue-600'>" + searchSequence.join("</span> → <span class='text-blue-600'>") + "</span> <span class='text-red-500 font-normal'>(Last input failed)</span>";
+                    document.getElementById('sequenceDisplay').innerHTML = "Seq: <span class='text-blue-600'>" + searchSequence.join("</span>→<span class='text-blue-600'>") + "</span> <span class='text-red-500 font-normal'>(Last input failed)</span>";
                 }
             }
         }
 
         function consumeRNG() {
-            let amount = parseInt(document.getElementById('consumeInput').value) || 1;
+            let amount = parseInt(document.getElementById('consumeInput').value) || 10;
             if (highlightedIndex + amount < generatedData.length) {
                 sequenceStartIndex = -1; // End the sequence trail once manually consumed
                 setHighlight(highlightedIndex + amount);
                 scroller.scrollTop = Math.max(0, (highlightedIndex * ITEM_HEIGHT) - (scroller.clientHeight / 2));
-                setStatus(`ADVANCED ${amount}`, "text-emerald-700 bg-emerald-100 border-emerald-300");
+                setStatus(`ADV ${amount}`, "text-emerald-700 bg-emerald-100 border-emerald-300");
             }
         }
 
         function clearSearch() {
             searchSequence = [];
             sequenceStartIndex = -1;
-            document.getElementById('sequenceDisplay').innerText = "Sequence: (None)";
+            document.getElementById('sequenceDisplay').innerText = "Seq: (None)";
             document.getElementById('healInput').value = "";
             setHighlight(0);
             scroller.scrollTop = 0;
-            setStatus("RESET", "text-slate-500 bg-white border-slate-300");
+            setStatus("RESET", "text-slate-500 bg-slate-50 border-slate-300");
         }
 
         function updateAdvances() {
@@ -717,56 +746,78 @@
             let P = highlightedIndex;
 
             if (currentMode === 'chest') {
-                let appChance = parseInt(document.getElementById('appChance').value) || 0;
-                let rngPos = parseInt(document.getElementById('rngPos').value) || 1;
-                let gilChance = parseInt(document.getElementById('gilChance').value) || 0;
-                let hasArmlet = document.getElementById('diamondArmlet').checked;
-                let item1Chance = hasArmlet ? 95 : 50;
-                let wantItem1 = document.getElementById('wantItem1').checked;
+                const appChance  = parseInt(document.getElementById('appChance').value)  || 0;
+                const rngPos     = parseInt(document.getElementById('rngPos').value)      || 1;
+                const gilChance  = parseInt(document.getElementById('gilChance').value)   || 0;
+                const hasArmlet  = document.getElementById('diamondArmlet').checked;
+                const item1Chance = hasArmlet ? 95 : 50;
+                const wantItem1  = document.getElementById('wantItem1').checked;
 
-                // Advance to Appear
+                // Chest uses 3 sequential RNG slots after your current position:
+                //   Slot 0 (= P + rngPos - 1): Spawn check    → percent < appChance
+                //   Slot 1 (= P + rngPos    ): Gil/Item check  → percent < gilChance = Gil
+                //   Slot 2 (= P + rngPos + 1): Content         → Gil amount OR Item 1/2
+
+                // --- Advance to Appear ---
+                // Find smallest W >= P where spawn check passes
                 let Z = P;
                 while (Z < generatedData.length) {
-                    let chestRNIndex = Z + rngPos - 1;
-                    if (chestRNIndex < generatedData.length && generatedData[chestRNIndex].percent < appChance) {
-                        break;
-                    }
+                    const spawnIdx = Z + rngPos - 1;
+                    if (spawnIdx < generatedData.length && generatedData[spawnIdx].percent < appChance) break;
                     Z++;
                 }
                 document.getElementById('advAppear').innerText = Z - P;
 
-                // Advance for Item
-                let Y = Z + rngPos;
+                // --- Advance for Item (specific item, chest must also appear) ---
+                // Find smallest W >= P where ALL three conditions are satisfied:
+                //   1. Spawn check passes
+                //   2. Gil/Item check = Item (NOT Gil)
+                //   3. Item selection = desired item (Item 1 or Item 2)
                 let advItem = "-";
-                while (Y < generatedData.length - 1) {
-                    let isItem = generatedData[Y].percent >= gilChance;
-                    if (isItem) {
-                        let isItem1 = (generatedData[Y+1].raw % 100) < item1Chance;
-                        if ((wantItem1 && isItem1) || (!wantItem1 && !isItem1)) {
-                            advItem = Y - P;
-                            break;
-                        }
-                    }
-                    Y++;
+                for (let W = P; W < generatedData.length; W++) {
+                    const spawnIdx   = W + rngPos - 1;  // spawn check
+                    const gilIdx     = W + rngPos;       // gil vs item check
+                    const contentIdx = W + rngPos + 1;   // item selection / gil amount
+
+                    if (contentIdx >= generatedData.length) break;
+
+                    // 1. Chest must appear
+                    if (generatedData[spawnIdx].percent >= appChance) continue;
+
+                    // 2. Must be Item (not Gil)
+                    if (generatedData[gilIdx].percent < gilChance) continue;
+
+                    // 3. Check which item
+                    const isItem1 = generatedData[contentIdx].percent < item1Chance;
+                    if (wantItem1 && isItem1)  { advItem = W - P; break; }
+                    if (!wantItem1 && !isItem1) { advItem = W - P; break; }
                 }
                 document.getElementById('advItem').innerText = advItem;
             } 
             else if (currentMode === 'steal') {
                 // Normal
                 let Yn = P;
+                let foundNormal = false;
                 while (Yn < generatedData.length) {
-                    if (generatedData[Yn].percent < 3) break;
+                    if (generatedData[Yn].percent < 3) {
+                        foundNormal = true;
+                        break;
+                    }
                     Yn++;
                 }
-                document.getElementById('advRareNormal').innerText = Yn - P;
+                document.getElementById('advRareNormal').innerText = foundNormal ? Math.max(0, Yn - P - 1) : "-";
 
                 // Cuffs
                 let Yc = P;
+                let foundCuffs = false;
                 while (Yc < generatedData.length) {
-                    if (generatedData[Yc].percent < 6) break;
+                    if (generatedData[Yc].percent < 6) {
+                        foundCuffs = true;
+                        break;
+                    }
                     Yc++;
                 }
-                document.getElementById('advRareCuffs').innerText = Yc - P;
+                document.getElementById('advRareCuffs').innerText = foundCuffs ? Math.max(0, Yc - P - 1) : "-";
             }
             else if (currentMode === 'spawn') {
                 let Ys = P;
