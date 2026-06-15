@@ -595,10 +595,10 @@
                     let nColor = "text-slate-400";
                     let cColor = "text-slate-400";
 
-                    if (i + 2 < generatedData.length) {
-                        let p1 = d.percent;
-                        let p2 = generatedData[i+1].percent;
-                        let p3 = generatedData[i+2].percent;
+                    if (i + 3 < generatedData.length) {
+                        let p1 = generatedData[i+1].percent;
+                        let p2 = generatedData[i+2].percent;
+                        let p3 = generatedData[i+3].percent;
                         
                         // Normal Steal
                         if (p1 < 3) { normal = "Rare"; nColor = "text-amber-600 font-bold bg-amber-50/50 px-1 py-0.5 rounded"; }
@@ -619,10 +619,18 @@
                     contentHtml = `<div class="px-2 md:px-4 cell-border whitespace-nowrap"><span class="${nColor}">${normal}</span></div><div class="px-2 md:px-4 whitespace-nowrap ${cColor}">${cuffs}</div>`;
                 }
                 else if (currentMode === 'spawn') {
-                    let isChocobo = d.raw < 16777216 ? "True" : "False";
-                    let chocoClass = (isChocobo === "True" && !isHighlight) ? 'text-red-600 font-bold bg-red-100 px-1.5 py-0.5 rounded border border-red-200' : 'text-slate-400';
-                    if(isChocobo === "True" && isHighlight) chocoClass = 'text-white font-bold';
-                    contentHtml = `<div class="px-2 md:px-4"><span class="${chocoClass}">${isChocobo}</span></div>`;
+                    let Ys = i + 1;
+                    while (Ys < generatedData.length) {
+                        if (generatedData[Ys].raw < 16777216) break;
+                        Ys++;
+                    }
+                    let countdown = Ys - i - 1;
+                    let text = countdown.toString();
+                    let chocoClass = 'text-slate-400 font-mono';
+                    if (countdown === 0) {
+                        chocoClass = isHighlight ? 'text-blue-800 font-bold' : 'text-red-600 font-bold bg-red-100 px-1.5 py-0.5 rounded border border-red-200';
+                    }
+                    contentHtml = `<div class="px-2 md:px-4"><span class="${chocoClass}">${text}</span></div>`;
                 }
 
                 // chest=4cols (Row,Heal,%,Contents), steal=5cols, spawn=3cols
@@ -854,12 +862,16 @@
                 document.getElementById('advRareCuffs').innerText = foundCuffs ? Yc - P - 1 : "-";
             }
             else if (currentMode === 'spawn') {
-                let Ys = P;
+                let Ys = P + 1;
+                let foundSpawn = false;
                 while (Ys < generatedData.length) {
-                    if (generatedData[Ys].raw < 16777216) break;
+                    if (generatedData[Ys].raw < 16777216) {
+                        foundSpawn = true;
+                        break;
+                    }
                     Ys++;
                 }
-                document.getElementById('advSpawn').innerText = Math.max(0, Ys - P - 1);
+                document.getElementById('advSpawn').innerText = foundSpawn ? (Ys - P - 1) : "-";
             }
         }
 
