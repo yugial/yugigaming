@@ -94,7 +94,7 @@
         .grid-row { border-bottom: 1px solid #f1f5f9; transition: background-color 0.1s; }
         .grid-row:nth-child(even) { background-color: #ffffff; }
         .grid-row:nth-child(odd) { background-color: #f8fafc; }
-        .grid-row:hover:not(.highlight):not(.sequence-trail) { background-color: #e2e8f0; }
+        .grid-row:hover:not(.highlight):not(.sequence-trail):not(.gold-row) { background-color: #e2e8f0; }
         
         .grid-row.highlight { 
             background: linear-gradient(90deg, #dbeafe 0%, #bfdbfe 100%); 
@@ -106,6 +106,12 @@
             background: linear-gradient(90deg, #dcfce7 0%, #bbf7d0 100%);
             color: #166534;
             border-left: 4px solid #22c55e;
+        }
+
+        .grid-row.gold-row {
+            background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+            color: #b45309;
+            border-left: 4px solid #f59e0b;
         }
         
         .cell-border { border-right: 1px solid #e2e8f0; }
@@ -528,8 +534,25 @@
                 let isHighlight = (i === highlightedIndex);
                 let isSequenceTrail = (sequenceStartIndex !== -1 && i >= sequenceStartIndex && i < highlightedIndex);
                 
+                let isGoldRow = false;
+                if (currentMode === 'steal') {
+                    const targetIdx = i + 1;
+                    if (targetIdx < generatedData.length) {
+                        const isNormalRare = generatedData[targetIdx].percent < 3;
+                        const isCuffsRare = generatedData[targetIdx].percent < 6;
+                        isGoldRow = isNormalRare || isCuffsRare;
+                    }
+                }
+                else if (currentMode === 'spawn') {
+                    const targetIdx = i + 1;
+                    if (targetIdx < generatedData.length) {
+                        isGoldRow = generatedData[targetIdx].raw < 16777216;
+                    }
+                }
+
                 let rowClass = '';
                 if (isHighlight) rowClass = 'highlight';
+                else if (isGoldRow) rowClass = 'gold-row';
                 else if (isSequenceTrail) rowClass = 'sequence-trail';
                 
                 let contentHtml = '';
@@ -606,6 +629,7 @@
                 
                 let textColor = 'text-slate-800 text-[13px] md:text-base';
                 if (isHighlight) textColor = 'text-blue-800 text-sm md:text-lg';
+                else if (isGoldRow) textColor = 'text-amber-900 text-sm md:text-lg';
                 else if (isSequenceTrail) textColor = 'text-green-800 text-sm md:text-lg';
 
                 // % cell only for chest and steal
@@ -723,11 +747,27 @@
 
         function consumeRNG() {
             let amount = parseInt(document.getElementById('consumeInput').value) || 10;
+            if (amount <= 0) return;
             if (highlightedIndex + amount < generatedData.length) {
-                sequenceStartIndex = -1; // End the sequence trail once manually consumed
+                if (sequenceStartIndex === -1) {
+                    sequenceStartIndex = highlightedIndex;
+                    searchSequence.push(generatedData[highlightedIndex].hp);
+                }
+                
+                for (let k = 1; k <= amount; k++) {
+                    searchSequence.push(generatedData[highlightedIndex + k].hp);
+                }
+                
+                document.getElementById('sequenceDisplay').innerHTML = "Seq: <span class='text-blue-600'>" + searchSequence.join("</span>→<span class='text-blue-600'>") + "</span>";
+                
                 setHighlight(highlightedIndex + amount);
                 scroller.scrollTop = Math.max(0, (highlightedIndex * ITEM_HEIGHT) - (scroller.clientHeight / 2));
                 setStatus(`ADV ${amount}`, "text-emerald-700 bg-emerald-100 border-emerald-300");
+                
+                if (highlightedIndex + 1 < generatedData.length) {
+                    let nextCure = generatedData[highlightedIndex + 1].hp;
+                    document.getElementById('healInput').value = nextCure;
+                }
             }
         }
 
