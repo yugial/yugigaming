@@ -112,7 +112,7 @@
         .cell-border { border-right: 1px solid #e2e8f0; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="flex flex-col md:h-screen md:overflow-hidden">
 
     <!-- Header -->
     <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between z-20 shadow-sm gap-3 md:gap-0 shrink-0">
@@ -136,13 +136,19 @@
     </header>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-3 md:p-6 gap-4 md:gap-6">
+    <div class="flex-1 flex flex-col md:flex-row md:overflow-hidden p-3 md:p-6 gap-4 md:gap-6">
         
         <!-- Left Panel: Controls -->
-        <div class="w-full md:w-[420px] shrink-0 flex flex-col gap-4 overflow-y-auto pr-1 pb-4 md:pb-10">
+        <div class="w-full md:w-[420px] shrink-0 flex flex-col gap-4 md:overflow-y-auto pr-1 pb-4 md:pb-10">
             
+            <!-- Mobile Toggle Button -->
+            <button id="mobileConfigToggle" onclick="toggleConfig()" class="md:hidden w-full bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow-md flex justify-between items-center transition active:scale-95">
+                <span class="flex items-center gap-2">⚙️ Setup & Modules</span>
+                <span id="toggleIcon" class="text-sm bg-slate-700 px-2 py-1 rounded">▼ Hide</span>
+            </button>
+
             <!-- Character Stats -->
-            <div class="panel">
+            <div class="panel config-item">
                 <div class="panel-title">Character Setup</div>
                 <div class="flex flex-col gap-3">
                     <div class="flex items-center justify-between">
@@ -168,7 +174,7 @@
             </div>
 
             <!-- MASSIVE MODULE SELECTOR -->
-            <div class="bg-slate-100 p-2 rounded-xl border-2 border-slate-200">
+            <div class="bg-slate-100 p-2 rounded-xl border-2 border-slate-200 config-item">
                 <div class="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Select Active Module</div>
                 <div class="flex gap-2 relative">
                     <button id="tabBtn-chest" class="flex-1 tab-btn active-tab py-3 text-sm rounded-lg" onclick="setMode('chest')">Chest</button>
@@ -179,7 +185,7 @@
 
             <!-- PANEL: CHEST -->
             <div id="panel-chest" class="block animate-fade-in">
-                <div class="panel border-2 border-blue-200 bg-blue-50/50 shadow-md">
+                <div class="panel border-2 border-blue-200 bg-blue-50/50 shadow-md config-item">
                     <div class="panel-title text-blue-600 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                         Chest Module
@@ -216,14 +222,14 @@
                     </div>
                 </div>
 
-                <div class="flex gap-3 mt-3">
-                    <div class="panel flex-1 flex flex-col justify-center items-center bg-white border-2 border-sky-200 shadow-md">
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Advance to Appear</div>
-                        <div id="advAppear" class="text-4xl font-bold font-mono text-sky-600">-</div>
+                <div class="flex gap-2 md:gap-3 mt-3">
+                    <div class="panel flex-1 flex flex-col justify-center items-center bg-white border-2 border-sky-200 shadow-sm md:shadow-md">
+                        <div class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0 md:mb-1">Advance to Appear</div>
+                        <div id="advAppear" class="text-3xl md:text-4xl font-bold font-mono text-sky-600">-</div>
                     </div>
-                    <div class="panel flex-1 flex flex-col justify-center items-center bg-white border-2 border-emerald-200 shadow-md">
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Advance for Item</div>
-                        <div id="advItem" class="text-4xl font-bold font-mono text-emerald-600">-</div>
+                    <div class="panel flex-1 flex flex-col justify-center items-center bg-white border-2 border-emerald-200 shadow-sm md:shadow-md">
+                        <div class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0 md:mb-1">Advance for Item</div>
+                        <div id="advItem" class="text-3xl md:text-4xl font-bold font-mono text-emerald-600">-</div>
                     </div>
                 </div>
             </div>
@@ -231,44 +237,44 @@
             <!-- PANEL: STEAL -->
             <div id="panel-steal" class="hidden animate-fade-in">
                 <div class="flex flex-col gap-3">
-                    <div class="panel border-2 border-indigo-200 bg-indigo-50 flex justify-between items-center shadow-md p-4">
+                    <div class="panel border-2 border-indigo-200 bg-indigo-50 flex justify-between items-center shadow-sm md:shadow-md">
                         <div>
-                            <div class="panel-title text-indigo-700 mb-1 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <div class="panel-title text-indigo-700 mb-0 md:mb-1 flex items-center gap-1 md:gap-2">
+                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                 Normal Steal
                             </div>
-                            <div class="text-xs text-slate-600 font-bold bg-indigo-100 px-2 py-1 rounded inline-block">Advance for Rare (3%)</div>
+                            <div class="text-[9px] md:text-xs text-slate-600 font-bold bg-indigo-100 px-1.5 py-0.5 md:px-2 md:py-1 rounded inline-block">Advance for Rare (3%)</div>
                         </div>
-                        <div id="advRareNormal" class="text-5xl font-bold font-mono text-indigo-600">-</div>
+                        <div id="advRareNormal" class="text-3xl md:text-5xl font-bold font-mono text-indigo-600">-</div>
                     </div>
-                    <div class="panel border-2 border-purple-200 bg-purple-50 flex justify-between items-center shadow-md p-4">
+                    <div class="panel border-2 border-purple-200 bg-purple-50 flex justify-between items-center shadow-sm md:shadow-md">
                         <div>
-                            <div class="panel-title text-purple-700 mb-1 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            <div class="panel-title text-purple-700 mb-0 md:mb-1 flex items-center gap-1 md:gap-2">
+                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                 Thief's Cuffs
                             </div>
-                            <div class="text-xs text-slate-600 font-bold bg-purple-100 px-2 py-1 rounded inline-block">Advance for Rare (6%)</div>
+                            <div class="text-[9px] md:text-xs text-slate-600 font-bold bg-purple-100 px-1.5 py-0.5 md:px-2 md:py-1 rounded inline-block">Advance for Rare (6%)</div>
                         </div>
-                        <div id="advRareCuffs" class="text-5xl font-bold font-mono text-purple-600">-</div>
+                        <div id="advRareCuffs" class="text-3xl md:text-5xl font-bold font-mono text-purple-600">-</div>
                     </div>
                 </div>
             </div>
 
             <!-- PANEL: SPAWN -->
             <div id="panel-spawn" class="hidden animate-fade-in">
-                <div class="panel border-2 border-red-200 bg-red-50 shadow-md">
-                    <div class="panel-title text-red-600 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+                <div class="panel border-2 border-red-200 bg-red-50 shadow-sm md:shadow-md">
+                    <div class="panel-title text-red-600 flex items-center gap-1 md:gap-2 mb-1 md:mb-2">
+                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
                         Rare Monster Spawn
                     </div>
-                    <div class="flex justify-between items-center mt-4">
+                    <div class="flex justify-between items-center mt-2 md:mt-4">
                         <div>
-                            <div class="text-lg font-bold text-slate-800">Lv99 Red Chocobo</div>
-                            <div class="text-xs text-slate-600 mt-2 font-bold bg-white px-2 py-1 rounded border border-red-100 inline-block">Requires Raw RNG < 16,777,216</div>
+                            <div class="text-base md:text-lg font-bold text-slate-800">Lv99 Red Chocobo</div>
+                            <div class="text-[9px] md:text-xs text-slate-600 mt-1 md:mt-2 font-bold bg-white px-1.5 py-0.5 md:px-2 md:py-1 rounded border border-red-100 inline-block">Requires Raw RNG < 16,777,216</div>
                         </div>
                         <div class="flex flex-col items-end">
-                            <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Advance To Spawn</span>
-                            <span id="advSpawn" class="text-5xl font-bold font-mono text-red-600 drop-shadow-sm">-</span>
+                            <span class="text-[9px] md:text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-0 md:mb-1">Advance To Spawn</span>
+                            <span id="advSpawn" class="text-4xl md:text-5xl font-bold font-mono text-red-600 drop-shadow-sm">-</span>
                         </div>
                     </div>
                 </div>
@@ -308,7 +314,7 @@
         </div>
 
         <!-- Right Panel: RNG Table -->
-        <div class="flex-1 bg-white border-2 border-slate-200 rounded-xl flex flex-col shadow-lg overflow-hidden relative min-h-[400px]">
+        <div class="h-[75vh] md:h-auto md:flex-1 bg-white border-2 border-slate-200 rounded-xl flex flex-col shadow-lg overflow-hidden relative min-h-[300px]">
             
             <!-- Dynamic Headers -->
             <div id="tableHeaders" class="grid table-header font-bold text-[13px] sticky top-0 z-10 shadow-sm">
@@ -427,6 +433,31 @@
         scroller.addEventListener('scroll', () => {
             requestAnimationFrame(updateVirtualScroll);
         });
+
+        function toggleConfig() {
+            const items = document.querySelectorAll('.config-item');
+            const icon = document.getElementById('toggleIcon');
+            let isHidden = false;
+
+            items.forEach(item => {
+                if (item.classList.contains('hidden')) {
+                    item.classList.remove('hidden');
+                    if (item.classList.contains('bg-blue-50/50') || item.classList.contains('flex-col')) {
+                        // Keep block or flex displays intact when removing hidden
+                    }
+                    isHidden = false;
+                } else {
+                    item.classList.add('hidden');
+                    isHidden = true;
+                }
+            });
+
+            if (isHidden) {
+                icon.innerHTML = '▶ Show';
+            } else {
+                icon.innerHTML = '▼ Hide';
+            }
+        }
 
         function setMode(mode) {
             currentMode = mode;
