@@ -141,7 +141,8 @@
             <div class="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg border-2 border-slate-200">
                 <span class="text-slate-500 text-xs font-semibold">Version:</span>
                 <select id="versionSelect" class="w-24 md:w-28 text-xs font-bold text-blue-600 border-none bg-transparent focus:ring-0 cursor-pointer p-0" onchange="generateList()">
-                    <option value="ps2" selected>PS2 / IZJS</option>
+                    <option value="ps2" selected>PS2 (Original)</option>
+                    <option value="izjs">IZJS</option>
                     <option value="tza">TZA / PC</option>
                 </select>
             </div>
@@ -200,19 +201,19 @@
                     <div class="grid grid-cols-2 gap-x-4 gap-y-2.5">
                         <div class="flex justify-between items-center">
                             <label class="text-[10px] text-slate-600 font-bold">Appears %</label>
-                            <input type="number" id="appChance" value="50" class="w-14 text-right font-mono text-xs font-bold" oninput="updateAdvances()">
+                            <input type="number" id="appChance" value="10" class="w-14 text-right font-mono text-xs font-bold" oninput="updateAdvances()">
                         </div>
                         <div class="flex justify-between items-center">
                             <label class="text-[10px] text-slate-600 font-bold">RNG Pos</label>
-                            <input type="number" id="rngPos" value="1" class="w-14 text-right font-mono text-xs font-bold" oninput="updateAdvances()">
+                            <input type="number" id="rngPos" value="1" class="w-14 text-right font-mono text-xs font-bold" oninput="updateVirtualScroll(); updateAdvances()">
                         </div>
                         <div class="flex justify-between items-center">
                             <label class="text-[10px] text-slate-600 font-bold">Gil Chance</label>
-                            <input type="number" id="gilChance" value="50" class="w-14 text-right font-mono text-xs font-bold" oninput="updateVirtualScroll()">
+                            <input type="number" id="gilChance" value="80" class="w-14 text-right font-mono text-xs font-bold" oninput="updateVirtualScroll()">
                         </div>
                         <div class="flex justify-between items-center">
                             <label class="text-[10px] text-slate-600 font-bold">Gil Amount</label>
-                            <input type="number" id="gilAmt" value="100" class="w-14 text-right font-mono text-xs font-bold" oninput="updateVirtualScroll()">
+                            <input type="number" id="gilAmt" value="1000" class="w-14 text-right font-mono text-xs font-bold" oninput="updateVirtualScroll()">
                         </div>
                         <div class="flex justify-between items-center col-span-2 mt-2 pt-2 border-t-2 border-blue-100">
                             <label class="text-xs font-bold text-amber-700 flex items-center gap-2 cursor-pointer bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200 w-full hover:bg-amber-100 transition">
@@ -793,44 +794,38 @@
                 const item1Chance = hasArmlet ? 95 : 50;
                 const wantItem1  = document.getElementById('wantItem1').checked;
 
-                // Chest uses 3 sequential RNG slots after your current position:
-                //   Slot 0 (= P + rngPos - 1): Spawn check    → percent < appChance
-                //   Slot 1 (= P + rngPos    ): Gil/Item check  → percent < gilChance = Gil
-                //   Slot 2 (= P + rngPos + 1): Content         → Gil amount OR Item 1/2
-
-                // --- Advance to Appear ---
-                // Find smallest W >= P where spawn check passes
-                let Z = P;
+                // --- Advance to Appear (Zoning-in required to spawn the chest) ---
+                // Find smallest Z >= P + 1 + rngPos where spawn check passes (at Z - 1)
+                let Z = P + 1 + rngPos;
+                let foundAppear = false;
                 while (Z < generatedData.length) {
-                    const spawnIdx = Z + rngPos - 1;
-                    if (spawnIdx < generatedData.length && generatedData[spawnIdx].percent < appChance) break;
+                    const spawnIdx = Z - 1;
+                    if (spawnIdx < generatedData.length && generatedData[spawnIdx].percent < appChance) {
+                        foundAppear = true;
+                        break;
+                    }
                     Z++;
                 }
-                document.getElementById('advAppear').innerText = Z - P;
+                document.getElementById('advAppear').innerText = foundAppear ? Z - P - 1 - rngPos : "-";
 
-                // --- Advance for Item (specific item, chest must also appear) ---
-                // Find smallest W >= P where ALL three conditions are satisfied:
-                //   1. Spawn check passes
-                //   2. Gil/Item check = Item (NOT Gil)
-                //   3. Item selection = desired item (Item 1 or Item 2)
+                // --- Advance for Item (Loot from ALREADY spawned chest) ---
+                // Find smallest W >= P + rngPos where:
+                //   1. Gil/Item check = Item (NOT Gil, at W)
+                //   2. Item selection = desired item (Item 1 or Item 2, at W + 1)
                 let advItem = "-";
-                for (let W = P; W < generatedData.length; W++) {
-                    const spawnIdx   = W + rngPos - 1;  // spawn check
-                    const gilIdx     = W + rngPos;       // gil vs item check
-                    const contentIdx = W + rngPos + 1;   // item selection / gil amount
+                for (let W = P + rngPos; W < generatedData.length; W++) {
+                    const gilIdx     = W;          // gil vs item check
+                    const contentIdx = W + 1;      // item selection / gil amount
 
                     if (contentIdx >= generatedData.length) break;
 
-                    // 1. Chest must appear
-                    if (generatedData[spawnIdx].percent >= appChance) continue;
-
-                    // 2. Must be Item (not Gil)
+                    // 1. Must be Item (not Gil)
                     if (generatedData[gilIdx].percent < gilChance) continue;
 
-                    // 3. Check which item
+                    // 2. Check which item
                     const isItem1 = generatedData[contentIdx].percent < item1Chance;
-                    if (wantItem1 && isItem1)  { advItem = W - P; break; }
-                    if (!wantItem1 && !isItem1) { advItem = W - P; break; }
+                    if (wantItem1 && isItem1)  { advItem = W - P - rngPos; break; }
+                    if (!wantItem1 && !isItem1) { advItem = W - P - rngPos; break; }
                 }
                 document.getElementById('advItem').innerText = advItem;
             } 
